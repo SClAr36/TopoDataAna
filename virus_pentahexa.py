@@ -3,6 +3,13 @@ from collections import Counter
 from Bio.PDB import MMCIFParser
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 
+# HEXAGON WRONG！HEXAGON WRONG! HEXAGON WRONG! 
+# Only Chain A is loaded thus NO Hexagon formed!
+
+# For Hexagon, Found it with:
+# - hexagon_scan.py
+# - visulize_selected_copy.py
+# - extract_virus_hex.py
 
 # =============================================================
 # Helper 1 — Remove duplicate atoms while keeping element info
