@@ -6,6 +6,7 @@ from utils.density_map import rigidity_density_map_3d_numba, normalize_density_m
 weight_dict = {'C':6, 'N':7, 'O':8, 'S':16, 'P':15, 'F':9, 'CL':17, 'BR':35, 'I':53,}
 etas = [1.0, 2.0, 6.0]
 
+
 penta_xlim = (40, 150)
 penta_ylim = (-56, 54)
 penta_zlim = (100, 200)
@@ -15,8 +16,8 @@ hexa_zlim = (74, 200)
 
 
 pentagon = np.load("data/biomole/virus_pentagon.npz", allow_pickle=True)
-penta_coords = pentagon["coords"]        # (5705, 3)
-penta_elem = pentagon["elements"]    # (5705,)
+penta_coords = pentagon["coords"]
+penta_elem = pentagon["elements"]
 
 hexagon = np.load("data/biomole/virus_hexagon.npz", allow_pickle=True)
 hexa_coords = hexagon["coords"]
@@ -44,19 +45,19 @@ def print_shape_and_bounds(filename):
 # print_shape_and_bounds("data/biomole/virus_pentagon.npz")
 # print_shape_and_bounds("data/biomole/virus_hexagon.npz")
 for eta in etas:
-    # pentagon
-    ps, py, pz, rho = rigidity_density_map_3d_numba(penta_coords, xlim=penta_xlim, ylim=penta_ylim, zlim=penta_zlim, grid_spacing=0.6, eta=eta)
+    # # pentagon
+    # ps, py, pz, rho = rigidity_density_map_3d_numba(penta_coords, xlim=penta_xlim, ylim=penta_ylim, zlim=penta_zlim, grid_spacing=0.6, eta=eta)
     
-    np.savez(
-        f"data/biomole/virus_penta_eta{eta}.npz",
-        xs=ps,
-        ys=py,
-        zs=pz,
-        rho=rho,
-    )
-    # rho = np.load(f"data/biomole/virus_penta_eta{eta}.npz")['rho']
-    rho_norm = normalize_density_map(rho)
-    barcode_from_field(rho_norm, separate_by_dim=True, min_bar_length=0.05, save_fig=f"figs/biomole/virus_penta_eta{eta}_sep.png", dpi=500)
+    # np.savez(
+    #     f"data/biomole/virus_penta_eta{eta}.npz",
+    #     xs=ps,
+    #     ys=py,
+    #     zs=pz,
+    #     rho=rho,
+    # )
+    # # rho = np.load(f"data/biomole/virus_penta_eta{eta}.npz")['rho']
+    # rho_norm = normalize_density_map(rho)
+    # barcode_from_field(rho_norm, separate_by_dim=True, min_bar_length=0.05, save_fig=f"figs/biomole/virus_penta_eta{eta}_sep.png", dpi=500)
 
     # hexagon
     hs, hy, hz, psi = rigidity_density_map_3d_numba(hexa_coords, xlim=hexa_xlim, ylim=hexa_ylim, zlim=hexa_zlim, grid_spacing=0.6, eta=eta)

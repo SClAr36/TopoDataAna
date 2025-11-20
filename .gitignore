@@ -4,3 +4,5 @@ data/
 figs/
 *.pdf
 *.png
+*.cif
+*.npz
