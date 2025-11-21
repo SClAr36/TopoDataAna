@@ -4,87 +4,7 @@ import gudhi as gd
 from scipy.ndimage import zoom
 import seaborn as sns
 
-# # ==========================================================
-# # 1️⃣ 点云 → 冲激图（双线性分布）
-# # ==========================================================
-# def splat_points_to_grid(points, xlim, ylim, nx, ny, dtype=np.float32):
-#     """
-#     把点云双线性映射到规则网格上形成冲激图 I[y,x].
-#     points: (N, 2) array
-#     """
-#     x0, x1 = xlim
-#     y0, y1 = ylim
-#     dx = (x1 - x0) / (nx - 1)
-#     dy = (y1 - y0) / (ny - 1)
-
-#     I = np.zeros((ny, nx), dtype=dtype)
-
-#     # 连续坐标 → 网格索引
-#     fx = (points[:, 0] - x0) / dx
-#     fy = (points[:, 1] - y0) / dy
-#     xL = np.floor(fx).astype(int)
-#     yL = np.floor(fy).astype(int)
-#     xH = xL + 1
-#     yH = yL + 1
-
-#     # 双线性权重
-#     wxH = fx - xL
-#     wyH = fy - yL
-#     wxL = 1.0 - wxH
-#     wyL = 1.0 - wyH
-
-#     def add_safe(y, x, w):
-#         mask = (x >= 0) & (x < nx) & (y >= 0) & (y < ny)
-#         if np.any(mask):
-#             np.add.at(I, (y[mask], x[mask]), w[mask].astype(dtype))
-
-#     add_safe(yL, xL, wxL * wyL)
-#     add_safe(yL, xH, wxH * wyL)
-#     add_safe(yH, xL, wxL * wyH)
-#     add_safe(yH, xH, wxH * wyH)
-#     return I
-
-
-# # ==========================================================
-# # 2️⃣ 频域高斯核
-# # ==========================================================
-# def gaussian_filter_hat(nx, ny, dx, dy, sigma):
-#     """
-#     频域高斯核 Ĝ(kx, ky) = exp(-0.5 * sigma^2 * (kx^2 + ky^2))
-#     """
-#     kx = 2.0 * np.pi * np.fft.rfftfreq(nx, d=dx)
-#     ky = 2.0 * np.pi * np.fft.fftfreq(ny, d=dy)
-#     KX, KY = np.meshgrid(kx, ky, indexing="xy")
-#     return np.exp(-0.5 * sigma**2 * (KX**2 + KY**2), dtype=np.float32)
-
-
-# # ==========================================================
-# # 3️⃣ κ=2 情况的多分辨率场生成 (FFT)
-# # ==========================================================
-# def generate_fields_fft_kappa2(points, xlim, ylim, etas, nx=1201, ny=1201, dtype=np.float32):
-#     x0, x1 = xlim
-#     y0, y1 = ylim
-#     dx = (x1 - x0) / (nx - 1)
-#     dy = (y1 - y0) / (ny - 1)
-
-#     # 1) 点云 → 冲激图
-#     I = splat_points_to_grid(points, xlim, ylim, nx, ny, dtype=dtype)
-
-#     # 2) 一次 FFT
-#     I_hat = np.fft.rfft2(I)
-
-#     # 3) 不同 η 的场
-#     F_stack = np.empty((len(etas), ny, nx), dtype=dtype)
-#     for i, eta in enumerate(etas):
-#         sigma = float(eta) / np.sqrt(2.0)
-#         G_hat = gaussian_filter_hat(nx, ny, dx, dy, sigma)
-#         F_eta = np.fft.irfft2(I_hat * G_hat, s=(ny, nx))
-#         F_stack[i] = F_eta
-#     return F_stack
-
-
 # ===========
-
 def precompute_distance_squared(points, xlim, ylim, nx, ny):
     """
     为所有点与所有网格预先计算距离平方 D_i(x,y)
@@ -197,49 +117,6 @@ def assemble_pbn_matrix(F_stack, etas, k=0, n_t=256):
 # ==========================================================
 # 6️⃣ 可视化
 # ==========================================================
-# def plot_pbn_heatmap(
-#     etas, t_grid, B, 
-#     eta_label=r"Resolution $\eta$", 
-#     t_label=r"Threshold $t$",
-#     title=None
-# ):
-#     """
-#     绘制 log10(B+1) 的 PBN 热力图，不包含等高线。
-#     """
-
-#     # ---- 1) 对所有 PBN 加 1 然后取 log10 ----
-#     B_log = np.log10(B + 1.0)   # 以 10 为底的对数
-
-#     fig, ax = plt.subplots(figsize=(6, 4))
-
-#     # imshow extent
-#     extent = (t_grid[0], t_grid[-1], etas[0], etas[-1])
-
-#     # ---- 2) 用 log 值作为颜色画图 ----
-#     im = ax.imshow(
-#         B_log,
-#         extent=extent,
-#         origin="lower",
-#         aspect="auto",
-#         interpolation="bicubic",
-#         cmap=cmap,
-#     )
-
-#     # ---- 3) colorbar 显示 log10 值 ----
-#     cbar = fig.colorbar(im, ax=ax)
-#     cbar.set_label(r"$\log_{10}(\beta_k(t) + 1)$")
-
-#     # ---- 4) 坐标轴与标题 ----
-#     ax.set_xlabel(t_label)
-#     ax.set_ylabel(eta_label)
-#     if title:
-#         ax.set_title(title)
-
-#     fig.tight_layout()
-#     plt.show()
-#     return fig, ax
-
-
 def plot_pbn_heatmap(
     etas, t_grid, B,
     eta_label=r"Resolution $\eta$",
